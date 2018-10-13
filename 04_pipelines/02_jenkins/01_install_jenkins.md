@@ -2,19 +2,27 @@
 
 Assuming helm is installed locally and on to your cluster, we can use that to deploy the stable jenkins chart. We will also setup ingress, and connect our jenkins deployment to the internet via ingress rules, in our chart.
 
-`cd examples`
+```
+$ cd examples
+```
 
-Lets take a moment to review `jenkins-values.minikube.yml` and/or `jenkins-values.aks.yml`
+Let's take a moment to review `jenkins-values.minikube.yml` and/or `jenkins-values.aks.yml`
 
-**Minikube** Exposed as NodePort
-`helm upgrade --install jenkins stable/jenkins -f jenkins-values.minikube.yml`
+**Minikube** Exposed as NodePort:
+```
+$ helm upgrade --install jenkins stable/jenkins -f jenkins-values.minikube.yml
+```
 
-**AKS** Exposed as LoadBalancer
-`helm upgrade --install jenkins stable/jenkins -f jenkins-values.aks.yml`
+**AKS** Exposed as LoadBalancer:
+```
+$ helm upgrade --install jenkins stable/jenkins -f jenkins-values.aks.yml
+```
 
 If you experience issues, you can roll back by deleting the release.
 
-`helm delete jenkins --purge`
+```
+$ helm delete jenkins --purge
+```
 
 ## Post-Install
 
@@ -51,8 +59,9 @@ http://10.0.2.15:31234/login
 
 The password is correct, but the ip address this command prints out, was not accurate for my environment. I ran `minikube ssh`, then `ifconfig`. Try the addresses provided in the output, more than likely it will be `eth` related.
 
-ifconfig
 ```
+$ ifconfig
+
 eth1      Link encap:Ethernet  HWaddr 08:00:27:93:C5:3A  
           inet addr:192.168.99.101  Bcast:192.168.99.255  Mask:255.255.255.0
           inet6 addr: fe80::a00:27ff:fe93:c53a/64 Scope:Link
