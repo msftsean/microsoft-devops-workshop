@@ -166,7 +166,7 @@ $ kubectl get replicationcontroller <rc-name>
 
 * List all replication controllers and services together in plain-text output format:
 ```
-$ kubectl get rc,services
+$ kubectl get rs,services
 ```
 
 * List all daemon sets, including uninitialized ones, in plain-text output format:

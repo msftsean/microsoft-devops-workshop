@@ -1,6 +1,6 @@
 # Test Pipeline
 
-Once you have Jenkins up, it is safe to go ahead and deploy our test pipeline, which will deploy a pod template with our necessary build containers, and print some text.
+Once you have Jenkins up, it is safe to deploy our test pipeline, which will deploy a pod template with our necessary build containers, and print some text.
 
 1. Log in to Jenkins
 2. `cd examples` in this page's directory.
@@ -12,7 +12,7 @@ Once you have Jenkins up, it is safe to go ahead and deploy our test pipeline, w
 8. Click on the build that is at the top of `Build History` on the left.
 9. Click Console Output 
 
-Your output should looks similar to the following:
+Your output should look similar to the following:
 
 ```
 Started by user admin

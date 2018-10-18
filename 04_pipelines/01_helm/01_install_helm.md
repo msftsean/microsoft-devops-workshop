@@ -2,16 +2,16 @@
 
 ## Install the Helm Cli Tools
 
-Helm comes with an additional command line tool, that functions similarly to kubectl, in that it is making calls against the kubernetes api.
+Helm comes with an additional command line tool, that functions similarly to kubectl, in that it is making calls against the Kubernetes API.
 
 You can retrieve the binary for your distribution, from their git release page:
 https://github.com/helm/helm/releases
 
-Or you can install it via package manager.
+Or, you can install it via package manager:
 
-Homebrew users can use `brew install kubernetes-helm`.
-Chocolatey users can use `choco install kubernetes-helm`.
-GoFish users can use `gofish install helm`.
+* Homebrew users can use `brew install kubernetes-helm`.
+* Chocolatey users can use `choco install kubernetes-helm`.
+* GoFish users can use `gofish install helm`.
 
 ## Install Helm to Kubernetes
 
@@ -19,6 +19,7 @@ If you have RBAC enabled, and you should, you should create the following local 
 
 ```
 $ cat << EOF > helm-tiller-sa.yml
+
 apiVersion: v1
 kind: ServiceAccount
 metadata:

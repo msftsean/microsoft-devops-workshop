@@ -1,6 +1,6 @@
 # Install Jenkins
 
-Assuming helm is installed locally and on to your cluster, we can use that to deploy the stable jenkins chart. We will also setup ingress, and connect our jenkins deployment to the internet via ingress rules, in our chart.
+Assuming helm is installed locally and on to your cluster, we can use that to deploy the stable jenkins chart. We will also setup ingress, and connect our jenkins deployment to the Internet via ingress rules, in our chart.
 
 ```
 $ cd examples
@@ -57,7 +57,7 @@ examples$ echo http://$NODE_IP:$NODE_PORT/login
 http://10.0.2.15:31234/login
 ```
 
-The password is correct, but the ip address this command prints out, was not accurate for my environment. I ran `minikube ssh`, then `ifconfig`. Try the addresses provided in the output, more than likely it will be `eth` related.
+The password is correct, but the IP address this command prints out, was not accurate for my environment. I ran `minikube ssh`, then `ifconfig`. Try the addresses provided in the output, more than likely it will be `eth` related.
 
 ```
 $ ifconfig
@@ -72,4 +72,4 @@ eth1      Link encap:Ethernet  HWaddr 08:00:27:93:C5:3A
           RX bytes:662160 (646.6 KiB)  TX bytes:1074965 (1.0 MiB)
 ```
 
-That means, in my case I want to naviate to http://192.168.99.101:31234/login and use my admin username and password to log in.
+That means, in my case I want to navigate to http://192.168.99.101:31234/login and use my admin username and password to log in.

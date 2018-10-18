@@ -4,7 +4,9 @@ If you are going to install 3rd party developed charts, it helps to understand h
 
 When you run the command:
 
-`helm search`
+```
+$ helm search
+```
 
 It lists off many charts that are available for immediate install. You can find the source code for all of these charts here:
 https://github.com/helm/charts/tree/master/stable
@@ -32,19 +34,26 @@ There is an alternative chart: https://github.com/helm/charts/tree/master/stable
 
 Neither of these is suitable, if you intended on using redis with PersistentVolumes, as neither chart implements PVs for redis. You could fork these charts, add the command flags to ensure data is written to disk, and then add our volumeClaimTemplate to the stateful deployments in the chart. 
 
-Of course doing these things makes the chart deviate from master and become unsupported. If the service you are working with is familiar to you, its just important, to understand the implications these resource pose, and what tools you might use to solve them.
+Of course, doing these things makes the chart deviate from master and become unsupported. If the service you are working with is familiar to you, it's just important, to understand the implications these resource pose, and what tools you might use to solve them.
 
 ## Deploying a Stable Chart from the Repo
 
-Helm has an upsert command that will install or update the release, if its present.
+Helm has an upsert command that will install or update the release, if it's present.
 
-`helm update --install <release name> <chart directory / repo chart> -f <values overrides>`
+```
+$ helm update --install <release name> <chart directory / repo chart> -f <values overrides>
+```
 
 ### Installing with default Values
-`helm update --install ha-redis stable/redis`
+
+```
+$ helm update --install ha-redis stable/redis
+```
 
 ### Installing with Custom Values
 
 You can copy the values.yaml from the chart repo to a local file called, `local-redis-values.yml`, and make customizations. Your values will be merged with the default values, prior to the interpolation step.
 
-`helm update --install ha-redis stable/redis -f local-redis-values.yml`
+```
+$ helm update --install ha-redis stable/redis -f local-redis-values.yml
+```

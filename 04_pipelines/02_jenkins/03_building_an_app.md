@@ -2,14 +2,14 @@
 
 We are going to pull our Jenkinsfile from our netcore-react example, from earlier.
 
-You will need to go into Jenkins Credential Manager and include at least your dockerhub credentials.
+You will need to go into Jenkins Credential Manager and include at least your Docker Hub credentials.
 
 **Credential**
-`docker_registry` is the necessary `credential_id` - (Username/Password) to access DockerHub. 
+`docker_registry` is the necessary `credential_id` - (Username/Password) to access Docker Hub.
 
 **NOTE** Push will fail, if you are not authorized to write to the docker hub repo.
 
-1. In your jenkins dashboard select `New Item`.
+1. In your Jenkins dashboard, select `New Item`.
 2. Call it `favorite-beer`, select `Pipeline` and click `Ok`.
 3. Scroll to the `Pipeline` section, select the `Definition` dropdown and choose `Pipeline script from SCM`.
 4. In the new `SCM` dropdown, select `Git`.

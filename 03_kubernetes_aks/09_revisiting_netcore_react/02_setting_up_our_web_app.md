@@ -34,7 +34,6 @@ volumes:
     driver: "local"
 ```
 
-
 Our deployment for the `voting`/`favorite-beer` app container.
 ```
 $ cat favorite-beer-deployment.yml
@@ -70,11 +69,10 @@ spec:
           containerPort: 80
 ```
 
-
 Notable Differences:
 
 1. The deployment metadata is included, and controller information are also included. 
-2. The containers section is populated from the `voting` section, with `image` replacing `build`
+2. The containers section is populated from the `voting` section, with `image` replacing `build`.
 3. `depends_on` is a docker-compose construct, that is excluded, but considered during deployment strategy. It tells us we will need to deploy our redis endpoint first, when we actually apply this to Kubernetes.
 4. `environment` becomes `env` under the containers spec, and takes a different input format.
 5. We have defined `REDIS_HOST` as `favorite-beer-redis`, as this is the `Service` name for our redis deployment, in the last section.
@@ -82,9 +80,9 @@ Notable Differences:
 
 ## Configuration
 
-That implementation is great, if we want to use one of the servicesettings.json files that is packaged within the application. However, we exposed these things to be able to update our settings at deploy time, so we can create a deployment that uses configmaps and volume mounts with custom configuration.
+That implementation is great, if we want to use one of the `servicesettings.json` files that is packaged within the application. However, we exposed these things to be able to update our settings at deploy time, so we can create a deployment that uses configmaps and volume mounts with custom configuration.
 
-Consider we define a configmap that includes a `servicesettings.json` with a few additional beverages, that looks like this:
+Consider if we define a configmap that includes a `servicesettings.json` with a few additional beverages, that looks like this:
 
 ```
 $ cat favorite-beer-configmap.yml
@@ -157,7 +155,7 @@ Later when this app is deployed to Kubernetes, we will deploy `favorite-beer-con
 
 ## Exposing this Deployment
 
-Since this is a service that recieve traffic internally or otherwise over the net, we will need to expose an endpoint. This is where the Kubernetes `Service` comes into play. As you may remember, when we were discussing the primitives there are 3 types of services each more complex than the last, building up to `LoadBalancer`.
+Since this is a service that recieves traffic internally or otherwise over the net, we will need to expose an endpoint. This is where the Kubernetes `Service` comes into play. As you may remember, when we were discussing the primitives there are 3 types of services each more complex than the last, building up to `LoadBalancer`.
 
 We can define a service for our deployment. If you already have a cluster running in AKS, you can speciy `type: LoadBalancer`, however on minikube you should use `NodePort`. This process executes iptables rules on every node, in the cluster for the NodePort defined. If not defined, it will choose a random available port, within a specific range. 
 

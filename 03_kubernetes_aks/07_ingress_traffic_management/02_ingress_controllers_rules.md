@@ -65,7 +65,6 @@ The default, maintained by Kubernetes, Ingress Controllers are: [GCE](https://gi
 There are existing Kubernetes concepts that allow you to expose a single Service, however, you can do so through an Ingress as well, by specifying a *default backend* with no rules.
 
 ```
-service/networking/ingress.yaml  
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -79,6 +78,7 @@ spec:
 If you create the above Ingress using `kubectl create -f`, you should see something like:
 ```
 $ kubectl get ingress test-ingress
+
 NAME           HOSTS   ADDRESS        PORTS     AGE
 test-ingress   *       52.168.9.176   80        59s
 ```

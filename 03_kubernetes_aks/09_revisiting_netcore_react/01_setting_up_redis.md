@@ -2,7 +2,7 @@
 
 Since redis is a dependency of our app, we should deploy it first. The recommended way is via `StatefulSet`
 
-We can map our understanding of the docker-compose.yml we developed in our local environment, to our understanding of this primitive in Kubernetes.
+We can map our understanding of the `docker-compose.yml` we developed in our local environment, to our understanding of this primitive in Kubernetes.
 
 ```
 $ cat docker-compose.alt.yml
@@ -69,7 +69,7 @@ Notable Differences:
 1. The deployment metadata is included, and controller information are also included. 
 2. The containers section is populated from the `redis` section, and command is split into command and args.
 3. `ports` becomes more defined, since we prefer to name ports in Kubernetes, and we have more options available.
-4. We have not included any information about volumes, getting moutned to the container, yet.
+4. We have not included any information about volumes, getting mounted to the container, yet.
 
 ## Persistent Volumes
 
@@ -166,13 +166,13 @@ $ kubectl apply -f favorite-beer-redis-statefulset.yml
 
 Notable Differences:
 
-1. A PersistentVolume and a PVC were created, specifying a hostPath that we want to mount our data to on our minikube node. The claim will consume the volume, when it is created.
-2. In our set, we reference the claim in the volumes section, and then specify the path in our container to mount it to, in the volumeMounts section.
-2. Anti Affinity - Added to prevent collisions with local hostpaths for minikube users, but for AKS, it can help satisfy availability, requirements if the pods are not colocated. The caveat being, you will need to have at least as many nodes, as pods you desire in the stateful set. In minikube, this is a single node cluster.
+1. A PersistentVolume and a PVC were created, specifying a `hostPath` that we want to mount our data to on our minikube node. The claim will consume the volume, when it is created.
+2. In our set, we reference the claim in the volumes section, and then specify the path in our container to mount it to, in the `volumeMounts` section.
+2. Anti-Affinity - Added to prevent collisions with local hostpaths for minikube users, but for AKS, it can help satisfy availability, requirements if the pods are not colocated. The caveat being, you will need to have at least as many nodes, as pods you desire in the stateful set. In minikube, this is a single node cluster.
 
 #### AKS
 
-In AKS, we can store out data in a Premium Managed Disk really easily, with Dynamic Provisioning.
+In AKS, we can store our data in a Premium Managed Disk really easily, with Dynamic Provisioning.
 
 ```
 $ cat favorite-beer-redis-statefulset.yml
@@ -216,13 +216,13 @@ $ kubectl apply -f favorite-beer-redis-statefulset.yml
 
 Notable Differences:
 
-1. In our set, we have specified a volumeClaimTemplate that will tell the AKS cloud provider, to create a Managed Disk and attach it to designated nodes for each pod that is created. We reference the claim template name and mount it to our containers data path, in the volumeMounts section.
+1. In our set, we have specified a `volumeClaimTemplate` that will tell the AKS cloud provider to create a Managed Disk and attach it to designated nodes for each pod that is created. We reference the claim template name and mount it to our containers data path, in the `volumeMounts` section.
 
 ## Exposing this StatefulSet
 
 Since this is a service that recieve traffic internally or otherwise over the net, we will need to expose an endpoint. This is where the Kubernetes `Service` comes into play. As you may remember, when we were discussing the primitives there are 3 types of services each more complex than the last, building up to `LoadBalancer`.
 
-We can define a service for our stateful set, and in this case we will choose `type: ClusterIP`. Applying this resource to our cluster, will create an internal (To the kubernetes cluster) ip that can be reached via the service name. We don't have any need to access our redis instance, outside of services running on Kubernetes, so no need to go further.
+We can define a service for our stateful set, and in this case we will choose `type: ClusterIP`. Applying this resource to our cluster, will create an internal (to the kubernetes cluster) IP that can be reached via the service name. We don't have any need to access our redis instance, outside of services running on Kubernetes, so no need to go further.
 
 ```
 $ cat favorite-beer-redis-service.yml
