@@ -5,7 +5,7 @@ Kubernetes can then provide service discovery and handle routing with the static
 
 There are 3 types of services each more complex than the last, building up to `LoadBalancer`.
 
-1. __ClusterIP__ [Default] - This results in a local ip that can be reached by other pods within the cluster only, end result is round robin traffic delivery.
+1. __ClusterIP__ [Default] - This results in a local IP that can be reached by other pods within the cluster _only_. The end result is round-robin traffic delivery.
 ![ClusterIP](img/service_-_clusterip.png)
 2. __NodePort__ - Includes a ClusterIP, but also creates an iptable rule on each node, at a designated port per service with this type, to allow external traffic.
 ![NodePort](img/service_-_nodeport.png)
