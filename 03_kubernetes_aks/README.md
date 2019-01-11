@@ -2,8 +2,6 @@
 
 Kubernetes (also known by its numeronym k8s) is an open source container cluster manager. Kubernetes' primary goal is to provide a platform for automating deployment, scaling, and operations of application containers across a cluster of hosts. Kubernetes was released by Google on July 2015.
 
-Latest stable release: v1.11.1 (2018-08-17)
-
 Get the latest stable release with:
 ```
 $ curl -sSL https://dl.k8s.io/release/stable.txt
@@ -17,7 +15,7 @@ These "primitives" are designed to be loosely coupled (i.e., where little to no 
 
 In this workshop, we will discuss how to setup Kubernetes clusters via the Azure AKS service. In a managed cluster, many of the control-plane components are abstracted from the end-user. This means that Azure provides an SLA for the control-plane and leaves you to focus on deploying and managing your workloads.
 
-Because you won't have access to the nodes running etcd and the api, there are some customizations that may not be possible, at that level. 
+Because you won't have access to the nodes running etcd and the API, there are some customizations that may not be possible, at that level. 
 
 ## Table of Contents
 
