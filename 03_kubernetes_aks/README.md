@@ -2,7 +2,7 @@
 
 Kubernetes (also known by its numeronym k8s) is an open source container cluster manager. Kubernetes' primary goal is to provide a platform for automating deployment, scaling, and operations of application containers across a cluster of hosts. Kubernetes was released by Google on July 2015.
 
-Get the latest stable release with:
+Find the latest stable release version with:
 ```
 $ curl -sSL https://dl.k8s.io/release/stable.txt
 ```
