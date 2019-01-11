@@ -2,7 +2,7 @@
 
 *Note: The following is loosly based on content found on the official [Docker website](https://www.docker.com/what-container), [Wikipedia](https://en.wikipedia.org/wiki/Docker_(software)), and various other locations.*
 
-A container image is a lightweight, stand-alone, executable package of a piece of software that includes everything needed to run it: code, runtime, system tools, system libraries, settings. Available for both Linux and Windows based apps, containerized software will always run the same, regardless of the environment. Containers isolate software from its surroundings, for example differences between development and staging environments and help reduce conflicts between teams running different software on the same infrastructure.
+A container image is a lightweight, stand-alone, executable package of a piece of software that includes everything needed to run it: code, runtime, system tools, system libraries, settings, etc. Available for both Linux and Windows based apps, containerized software will always run the same, regardless of the environment. Containers isolate software from its surroundings, for example differences between development and staging environments and help reduce conflicts between teams running different software on the same infrastructure.
 
 <dl>
   <dt>Lightweight</dt>
