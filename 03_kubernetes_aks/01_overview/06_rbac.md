@@ -2,7 +2,10 @@
 
 Kubernetes has additional primitives which are specific to RBAC, and have been GA since version 1.8. 
 
+See: [RBAC Official Docs](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+
 #### Role
+
 A Role can only be used to grant access to resources within a single namespace.
 
 ```
@@ -18,10 +21,11 @@ rules:
 ```
 
 #### ClusterRole
+
 A ClusterRole can be used to grant the same permissions as a Role, but they are cluster-scoped can grant access to:
 - cluster-scoped resources (like nodes)
-- non-resource endpoints (like “/healthz”)
-- namespaced resources (like pods) across all namespaces (needed to run kubectl get pods --all-namespaces, for example)
+- non-resource endpoints (like "`/healthz`")
+- namespaced resources (like Pods) across all namespaces (needed to run `kubectl get pods --all-namespaces`, for example)
 
 ```
 kind: ClusterRole
@@ -36,10 +40,11 @@ rules:
 ```
 
 #### RoleBinding
-A RoleBinding may reference a Role in the same namespace. The following RoleBinding grants the “pod-reader” role to the user “jane” within the “default” namespace. This allows “jane” to read pods in the “default” namespace.
+
+A RoleBinding may reference a Role in the same namespace. The following RoleBinding grants the "pod-reader" role to the user "jane" within the "default" namespace. This allows "jane" to read Pods in the "default" namespace.
 
 ```
-# This role binding allows "jane" to read pods in the "default" namespace.
+# This role binding allows "jane" to read Pods in the "default" namespace.
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -50,12 +55,12 @@ subjects:
   name: jane # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role #this must be Role or ClusterRole
+  kind: Role # this must be Role or ClusterRole
   name: pod-reader # this must match the name of the Role or ClusterRole you wish to bind to
   apiGroup: rbac.authorization.k8s.io
 ```
 
-A RoleBinding may also reference a ClusterRole to grant the permissions to namespaced resources defined in the ClusterRole within the RoleBinding’s namespace.
+A RoleBinding may also reference a ClusterRole to grant the permissions to namespaced resources defined in the ClusterRole within the RoleBinding's namespace.
 
 ```
 # This role binding allows "dave" to read secrets in the "development" namespace.
@@ -75,6 +80,7 @@ roleRef:
 ```
 
 #### ClusterRoleBinding
+
 A ClusterRoleBinding may be used to grant permission at the cluster level and in all namespaces.
 
 ```
@@ -94,7 +100,8 @@ roleRef:
 ```
 
 #### ServiceAccount
-Service accounts can replace "User" in the `subjects` section of each role binding. These are also defined as yaml, and are generally used to allow pods to make API calls, from wtihin the cluster. For instance, the ingress controller add-ons mentioned in the previous section, use serviceAccounts to fetch pod ip addresses, and the cluster-autoscaler add-on uses the api to read and respond to "Unschedulable" events. There is also a specialized Jenkins container designed to run on Kubernetes, which utlilizes the API to spin up each worker as a pod of containers, at the time a job is scheduled.
+
+Service accounts can replace "User" in the `subjects` section of each role binding. These are also defined as YAML, and are generally used to allow Pods to make API calls, from within the cluster. For instance, the Ingress Controller add-ons mentioned in the previous section, use serviceAccounts to fetch Pod IP addresses, and the cluster-autoscaler add-on uses the API to read and respond to "Unschedulable" events. There is also a specialized Jenkins container designed to run on Kubernetes, which utlilizes the API to spin up each worker as a Pod of containers, at the time a job is scheduled.
 
 ```
 apiVersion: v1
@@ -103,7 +110,7 @@ metadata:
   name: jenkins
 ```
 
-For example, to assign a service account to a role, you might do something similar to the following.
+For example, to assign a Service Account to a Role, you might do something similar to the following:
 ```
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -135,4 +142,26 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: jenkins
+```
+
+## Privilege escalation prevention
+
+The RBAC API prevents users from escalating privileges by editing roles or role bindings. Because this is enforced at the API level, it applies even when the RBAC authorizer is not in use.
+
+* You cannot create a Role or ClusterRole that grants permissions you do not have.
+* You cannot create a RoleBinding or ClusterRoleBinding that binds to a Role with permissions you do not have (unless you have been explicitly given "bind" permission on the role).
+* Grant explicit bind access:
+```
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: role-grantor
+rules:
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["rolebindings"]
+  verbs: ["create"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["clusterroles"]
+  verbs: ["bind"]
+  resourceNames: ["admin", "edit", "view"]
 ```
