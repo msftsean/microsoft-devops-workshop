@@ -38,16 +38,16 @@ Of course, doing these things makes the chart deviate from master and become uns
 
 ## Deploying a Stable Chart from the Repo
 
-Helm has an upsert command that will install or update the release, if it's present.
+Helm has an upsert command that will install or upgrade the release, if it's present.
 
 ```
-$ helm update --install <release name> <chart directory / repo chart> -f <values overrides>
+$ helm upgrade --install <release name> <chart directory / repo chart> -f <values overrides>
 ```
 
 ### Installing with default Values
 
 ```
-$ helm update --install ha-redis stable/redis
+$ helm upgrade --install ha-redis stable/redis
 ```
 
 ### Installing with Custom Values

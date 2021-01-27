@@ -53,6 +53,7 @@ Because you won't have access to the nodes running etcd and the API, there are s
 7. [Ingress / Traffic Routing](07_ingress_traffic_management)
    1. [Defining Services (ClusterIP / NodePort / LoadBalancer)](07_ingress_traffic_management/01_defining_services.md)
    2. [Ingress Controllers / Rules](07_ingress_traffic_management/02_ingress_controllers_rules.md)
+   3. [Service Mesh](07_ingress_traffic_management/03_service_mesh)
 8. [Auto-Scaling / SRE](08_autoscaling_sre)
    1. [Resources (Limits / Requests)](08_autoscaling_sre/01_resources.md)
    2. [NodeSelector/Affinity/Anti-Affinity](08_autoscaling_sre/02_selector_affinity_antiaffinity.md)
