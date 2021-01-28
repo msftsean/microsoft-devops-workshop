@@ -2,9 +2,11 @@
 
 Istio has components that run inside of the Kubernetes cluster, but it also has a client that should be installed locally.
 
-Follow the directions on this page to find the appropriate binary for your system.
+Follow the directions on this page to find the appropriate binary for your system, using the latest version.
 
 https://docs.microsoft.com/en-us/azure/aks/servicemesh-istio-install?pivots=client-operating-system-linux
+
+At the latest revision of this document, the version is `1.8.2`
 
 ## Install the Istio Operator
 
@@ -16,7 +18,8 @@ istioctl operator init
 
 Expected Output:
 ```
-Using operator Deployment image: docker.io/istio/operator:1.7.3
+Installing operator controller in namespace: istio-operator using image: docker.io/istio/operator:1.8.2
+Operator controller will watch namespaces: istio-system
 ✔ Istio operator installed                                                                                                                                                                                                                                                    
 ✔ Installation complete
 ```
@@ -28,6 +31,16 @@ kubectl get pods -n istio-operator
 
 ## Deploy Istio Service Mesh
 
+In order to deploy the service mesh, we need to setup the configuration that instructs what features are in-use. Thankfully, istioctl provides some profiles from which we can base our configuration.
+
+https://istio.io/latest/docs/setup/additional-setup/config-profiles/
+
+Run the following command to get the default configuration printed out.
+```
+istioctl profile dump default
+```
+
+We can use this default configuration and define some overrides, when we setup the mesh.
 Create the following file in the same location, where istioctl was installed.
 
 istio.aks.yml
@@ -41,25 +54,14 @@ spec:
   # Use the default profile as the base
   # More details at: https://istio.io/docs/setup/additional-setup/config-profiles/
   profile: default
-  # Enable the addons that we will want to use
-  addonComponents:
-    grafana:
-      enabled: true
-    prometheus:
-      enabled: true
-    tracing:
-      enabled: true
-    kiali:
-      enabled: true
   values:
     global:
       # Ensure that the Istio pods are only scheduled to run on Linux nodes
       defaultNodeSelector:
         beta.kubernetes.io/os: linux
-    kiali:
-      dashboard:
-        auth:
-          strategy: anonymous 
+      # Uncomment this, if you want to allow tcpdump on the proxy.
+      # proxy:
+      #   privileged: true
 ```
 
 The above definition is leveraging the extension to the API, that the Istio operator provides. In this case, we are creating an IstioOperator object, which has details about the mesh we want to install onto the cluster. In more advanced, but uncommon use cases, you could have multiple service meshes defined for a single cluster, represented by multiple IstioOperator objects. There is a link to supported config profiles for a deeper look into the options available.
@@ -75,45 +77,29 @@ kubectl get all -n istio-system
 If all three commands are successful, the output should contain the control plane components and look similar to the following:
 ```
 NAME                                        READY   STATUS    RESTARTS   AGE
-pod/grafana-94dc6c584-rn4vb                 1/1     Running   0          2m38s
-pod/istio-ingressgateway-5d795cc47f-ddjgq   1/1     Running   0          3m10s
-pod/istio-tracing-85849cbd5f-j6hnm          1/1     Running   0          2m37s
-pod/istiod-5c6b7b5b8f-9vxjw                 1/1     Running   0          3m23s
-pod/kiali-bb4d5579d-xrg8m                   1/1     Running   0          2m37s
-pod/prometheus-66c98799dc-68sgn             1/1     Running   0          2m37s
+pod/istio-ingressgateway-6878d85997-v8txh   1/1     Running   0          31s
+pod/istiocoredns-5b5d4d8b49-lzsqc           2/2     Running   0          31s
+pod/istiod-69ff48c887-229gt                 1/1     Running   0          38s
 
-NAME                                TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)                                                      AGE
-service/grafana                     ClusterIP      10.100.51.136   <none>         3000/TCP                                                     2m39s
-service/istio-ingressgateway        LoadBalancer   10.100.59.132   34.94.174.31   15021:30137/TCP,80:30837/TCP,443:32250/TCP,15443:30654/TCP   3m10s
-service/istiod                      ClusterIP      10.100.63.16    <none>         15010/TCP,15012/TCP,443/TCP,15014/TCP,853/TCP                3m24s
-service/jaeger-agent                ClusterIP      None            <none>         5775/UDP,6831/UDP,6832/UDP                                   2m39s
-service/jaeger-collector            ClusterIP      10.100.49.52    <none>         14267/TCP,14268/TCP,14250/TCP                                2m39s
-service/jaeger-collector-headless   ClusterIP      None            <none>         14250/TCP                                                    2m38s
-service/jaeger-query                ClusterIP      10.100.54.87    <none>         16686/TCP                                                    2m38s
-service/kiali                       ClusterIP      10.100.61.148   <none>         20001/TCP                                                    2m38s
-service/prometheus                  ClusterIP      10.100.48.95    <none>         9090/TCP                                                     2m38s
-service/tracing                     ClusterIP      10.100.48.151   <none>         80/TCP                                                       2m38s
-service/zipkin                      ClusterIP      10.100.56.44    <none>         9411/TCP                                                     2m38s
+NAME                           TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)                                                                      AGE
+service/istio-ingressgateway   LoadBalancer   10.100.52.77    <pending>     15021:31898/TCP,80:32624/TCP,443:30466/TCP,15012:32545/TCP,15443:30791/TCP   32s
+service/istiocoredns           ClusterIP      10.100.60.106   <none>        53/UDP,53/TCP                                                                32s
+service/istiod                 ClusterIP      10.100.62.94    <none>        15010/TCP,15012/TCP,443/TCP,15014/TCP                                        40s
 
 NAME                                   READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/grafana                1/1     1            1           2m39s
-deployment.apps/istio-ingressgateway   1/1     1            1           3m12s
-deployment.apps/istio-tracing          1/1     1            1           2m39s
-deployment.apps/istiod                 1/1     1            1           3m25s
-deployment.apps/kiali                  1/1     1            1           2m39s
-deployment.apps/prometheus             1/1     1            1           2m39s
+deployment.apps/istio-ingressgateway   1/1     1            1           32s
+deployment.apps/istiocoredns           1/1     1            1           32s
+deployment.apps/istiod                 1/1     1            1           40s
 
 NAME                                              DESIRED   CURRENT   READY   AGE
-replicaset.apps/grafana-94dc6c584                 1         1         1       2m39s
-replicaset.apps/istio-ingressgateway-5d795cc47f   1         1         1       3m12s
-replicaset.apps/istio-tracing-85849cbd5f          1         1         1       2m39s
-replicaset.apps/istiod-5c6b7b5b8f                 1         1         1       3m25s
-replicaset.apps/kiali-bb4d5579d                   1         1         1       2m39s
-replicaset.apps/prometheus-66c98799dc             1         1         1       2m39s
+replicaset.apps/istio-ingressgateway-6878d85997   1         1         1       32s
+replicaset.apps/istiocoredns-5b5d4d8b49           1         1         1       32s
+replicaset.apps/istiod-69ff48c887                 1         1         1       40s
 
-NAME                                                       REFERENCE                         TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
-horizontalpodautoscaler.autoscaling/istio-ingressgateway   Deployment/istio-ingressgateway   3%/80%    1         5         1          3m11s
-horizontalpodautoscaler.autoscaling/istiod                 Deployment/istiod                 1%/80%    1         5         1          3m25s
+NAME                                                       REFERENCE                         TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/istio-ingressgateway   Deployment/istio-ingressgateway   <unknown>/80%   1         5         1          32s
+horizontalpodautoscaler.autoscaling/istiocoredns           Deployment/istiocoredns           <unknown>/80%   1         5         1          32s
+horizontalpodautoscaler.autoscaling/istiod                 Deployment/istiod                 <unknown>/80%   1         5         1          40s
 ```
 
 Additionally, we can see what the operator logged during the installation:
@@ -124,14 +110,14 @@ kubectl logs -n istio-operator -l name=istio-operator -f
 
 Expected Output:
 ```
-2021-01-27T23:44:01.055571Z	info	installer	creating resource: Service/istio-system/jaeger-query
-2021-01-27T23:44:01.105538Z	info	installer	creating resource: Service/istio-system/kiali
-2021-01-27T23:44:01.152529Z	info	installer	creating resource: Service/istio-system/prometheus
-2021-01-27T23:44:01.192335Z	info	installer	creating resource: Service/istio-system/tracing
-2021-01-27T23:44:01.228173Z	info	installer	creating resource: Service/istio-system/zipkin
-- Processing resources for Addons.
-- Processing resources for Addons. Waiting for Deployment/istio-system/grafana, Deployment/istio-...
-- Processing resources for Addons. Waiting for Deployment/istio-system/kiali, Deployment/istio-sy...
-- Processing resources for Addons. Waiting for Deployment/istio-system/kiali
-✔ Addons installed
+2021-01-28T08:32:03.846927Z	info	installer	Creating EnvoyFilter/istio-system/tcp-stats-filter-1.7 (istio-control-plane/)
+2021-01-28T08:32:03.869470Z	info	installer	Creating EnvoyFilter/istio-system/tcp-stats-filter-1.8 (istio-control-plane/)
+2021-01-28T08:32:03.891153Z	info	installer	Creating ConfigMap/istio-system/istio (istio-control-plane/)
+2021-01-28T08:32:03.903948Z	info	installer	Creating ConfigMap/istio-system/istio-sidecar-injector (istio-control-plane/)
+2021-01-28T08:32:03.923524Z	info	installer	Creating MutatingWebhookConfiguration//istio-sidecar-injector (istio-control-plane/)
+2021-01-28T08:32:03.938982Z	info	installer	Creating Deployment/istio-system/istiod (istio-control-plane/)
+2021-01-28T08:32:03.958156Z	info	installer	Creating PodDisruptionBudget/istio-system/istiod (istio-control-plane/)
+2021-01-28T08:32:03.995469Z	info	installer	Creating HorizontalPodAutoscaler/istio-system/istiod (istio-control-plane/)
+2021-01-28T08:32:04.013481Z	info	installer	Creating Service/istio-system/istiod (istio-control-plane/)
+- Processing resources for Istiod.
 ```
