@@ -4,6 +4,8 @@ With the components properly installed, we can deploy some workloads to verify t
 
 This first command will tell istio, that any pods in the default namespace, will need to have the envoy sidecar injected automatically.
 
+https://istio.io/latest/docs/ops/configuration/mesh/injection-concepts/
+
 ```
 kubectl label namespace default istio-injection=enabled
 ```
