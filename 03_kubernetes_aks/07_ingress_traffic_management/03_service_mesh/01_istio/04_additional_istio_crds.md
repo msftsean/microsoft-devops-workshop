@@ -4,6 +4,45 @@ https://istio.io/latest/docs/reference/config/networking/
 
 https://github.com/istio/istio/tree/master/samples/bookinfo/networking
 
+### DestinationRule
+
+DestinationRule defines policies that apply to traffic intended for a service after routing has occurred. These rules specify configuration for load balancing, connection pool size from the sidecar, and outlier detection settings to detect and evict unhealthy hosts from the load balancing pool.
+
+https://istio.io/latest/docs/reference/config/networking/destination-rule/
+
+```
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: bookinfo-ratings
+spec:
+  host: ratings.default.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_CONN
+```
+
+```
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: reviews
+spec:
+  host: reviews
+  trafficPolicy:
+    loadBalancer:
+      simple: RANDOM
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+  - name: v3
+    labels:
+      version: v3
+```
 
 ### VirtualService
 
@@ -152,41 +191,4 @@ metadata:
 spec:
   mtls:
     mode: STRICT
-```
-
-### DestinationRule
-
-DestinationRule defines policies that apply to traffic intended for a service after routing has occurred. These rules specify configuration for load balancing, connection pool size from the sidecar, and outlier detection settings to detect and evict unhealthy hosts from the load balancing pool.
-
-https://istio.io/latest/docs/reference/config/networking/destination-rule/
-
-```
-apiVersion: networking.istio.io/v1beta1
-kind: DestinationRule
-metadata:
-  name: bookinfo-ratings
-spec:
-  host: ratings.default.svc.cluster.local
-  trafficPolicy:
-    loadBalancer:
-      simple: LEAST_CONN
-```
-
-```
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: reviews
-spec:
-  host: reviews
-  subsets:
-  - name: v1
-    labels:
-      version: v1
-  - name: v2
-    labels:
-      version: v2
-  - name: v3
-    labels:
-      version: v3
 ```
