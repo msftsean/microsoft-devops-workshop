@@ -264,3 +264,54 @@ $ kubectl logs <pod-name>
 ```
 $ kubectl logs -f <pod-name>
 ```
+
+### <code>kubectl explain</code>
+
+List the fields for supported resources.
+
+* Get the documentation of a resource (aka "kind") and its fields:
+```
+$ kubectl explain deployment
+KIND:     Deployment
+VERSION:  apps/v1
+
+DESCRIPTION:
+     Deployment enables declarative updates for Pods and ReplicaSets.
+
+FIELDS:
+   apiVersion	<string>
+     APIVersion defines the versioned schema of this representation of an
+     object. Servers should convert recognized schemas to the latest internal
+     value, and may reject unrecognized values. More info:
+     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+
+   kind	<string>
+     Kind is a string value representing the REST resource this object
+     represents. Servers may infer this from the endpoint the client submits
+     requests to. Cannot be updated. In CamelCase. More info:
+     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+
+   metadata	<Object>
+     Standard object metadata.
+
+   spec	<Object>
+     Specification of the desired behavior of the Deployment.
+
+   status	<Object>
+     Most recently observed status of the Deployment
+```
+
+* Get a list of all the resource types and their latest supported version:
+```
+$ for kind in $(kubectl api-resources | tail +2 | awk '{print $1}'); do
+    kubectl explain ${kind};
+  done | grep -E "^KIND:|^VERSION:"
+
+KIND:     Binding
+VERSION:  v1
+KIND:     ComponentStatus
+VERSION:  v1
+KIND:     ConfigMap
+VERSION:  v1
+...
+```
