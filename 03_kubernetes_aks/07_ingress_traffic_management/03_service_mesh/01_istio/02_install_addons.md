@@ -281,7 +281,7 @@ Whenever you make changes and re-apply this resource, you should restart the cur
 
 Check Out Kiali Dashboard (navigate to localhost:20001):
 ```
-kubectl port-forward svc/kube-prometheus-stack-prometheus -n monitoring 20001 20001
+kubectl port-forward svc/kiali -n istio-system 20001 20001
 ```
 
 
