@@ -315,3 +315,31 @@ KIND:     ConfigMap
 VERSION:  v1
 ...
 ```
+
+* Get a list of _all_ allowable fields for a given primitive:
+```
+$ kubectl explain deployment --recursive | head
+KIND:     Deployment
+VERSION:  apps/v1
+
+DESCRIPTION:
+     Deployment enables declarative updates for Pods and ReplicaSets.
+
+FIELDS:
+   apiVersion	<string>
+   kind	<string>
+   metadata	<Object>
+```
+
+* Get documentation ("man page"-style) for a given field in a given primitive:
+```
+$ kubectl explain deployment.status.availableReplicas
+KIND:     Deployment
+VERSION:  apps/v1
+
+FIELD:    availableReplicas <integer>
+
+DESCRIPTION:
+     Total number of available pods (ready for at least minReadySeconds)
+     targeted by this deployment.
+```
