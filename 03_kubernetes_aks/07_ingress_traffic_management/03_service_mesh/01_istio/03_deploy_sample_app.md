@@ -107,9 +107,75 @@ metadata:
 spec:
   mtls:
     mode: STRICT
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: productpage
+spec:
+  host: productpage
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: reviews
+spec:
+  host: reviews
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    loadBalancer:
+      simple: RANDOM
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+  - name: v3
+    labels:
+      version: v3
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: ratings
+spec:
+  host: ratings
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: details
+spec:
+  host: details
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+---
 ```
 
 `kubectl apply -f istio-default.mtls.yml`
+
 
 ### Validate
 
@@ -175,3 +241,141 @@ bash-5.0# curl details.default:9080
 ```
 
 If you are still following the tcpdump, that would show that the request was encrypted even though we used http from the app container.
+
+## Enable TLS at the Gateway
+
+In our sample application, so far, we have deployed this as the original Gateway, which opens up http protocols:
+
+```
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bookinfo-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+```
+
+To enable TLS at the Gateway level, we need to have a certificate in hand, or generate a self-signed certifiate. 
+
+In this case, I will generate a self-signed certificate, but you can skip this step if you have your certificate parts.
+
+*Note:* When using a self-signed certificate, browsers may restrict you from accessing the site with certificate not being trusted, we will leverage curl to test in leiu of the browser, for this reason.
+
+```
+export HOST=redapt.com
+export KEY_FILE=redapt.key
+export CERT_FILE=redapt.crt
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ${KEY_FILE} -out ${CERT_FILE} -subj "/CN=${HOST}/O=${HOST}"
+```
+
+Once you have a cert and key, self-signed via the method above or otherwise, we can upload that to Kubernetes using the tls secret type. We will want to upload this certificate to the istio-system namespace.
+
+```
+export CERT_NAME=tls-redapt-com
+kubectl create secret tls ${CERT_NAME} --key ${KEY_FILE} --cert ${CERT_FILE} -n istio-system
+```
+
+With this secret `tls-redapt-com` in the istio-system namespace, we can re-define our Gateway.
+
+tls-gateway.yml
+```
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bookinfo-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: tls-redapt-com # must be the same as secret
+    hosts:
+    - "*"
+```
+
+```
+kubectl apply -f tls-gateway.yml
+```
+
+Verify that TLS is enabled, and that http calls are blocked.
+
+```
+export GATEWAY_IP=$(kubectl get svc -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+curl -lk https://$GATEWAY_IP/productpage
+
+# Expected Timeout from this call
+curl -lk http://$GATEWAY_IP/productpage
+```
+
+Generate some load:
+```
+for i in $(seq 1 100); do curl -sk -o /dev/null "https://65.52.112.75/productpage"; done
+```
+
+### Enable HTTPS Redirect
+
+Because istio is a layer 7 load balancer, one thing we can do is accept and redirect http requests, directly at the gateway.
+
+tls-gateway.yml
+```
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bookinfo-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+    tls:
+      httpsRedirect: true
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: tls-redapt-com # must be the same as secret
+    hosts:
+    - "*"
+```
+
+```
+kubectl apply -f tls-gateway-redirect.yml
+```
+
+```
+export GATEWAY_IP=$(kubectl get svc -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+curl -lkv http://$GATEWAY_IP/productpage
+```
+
+Note:
+
+```
+< HTTP/1.1 301 Moved Permanently
+< location: https://65.52.112.75/productpage
+```
+
+To have curl follow the redirect, and get the end-user response.
+
+```
+curl -Lk https://$GATEWAY_IP/productpage
+```
