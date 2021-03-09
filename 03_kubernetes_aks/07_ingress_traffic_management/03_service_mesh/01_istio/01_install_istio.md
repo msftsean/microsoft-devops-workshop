@@ -55,6 +55,13 @@ spec:
   # More details at: https://istio.io/docs/setup/additional-setup/config-profiles/
   profile: default
   values:
+    gateways:
+      istio-ingressgateway:
+        autoscaleEnabled: true
+        type: LoadBalancer
+        # Uncomment this, if youd like it to be internal load balancing ingress.
+        # serviceAnnotations:
+        #   service.beta.kubernetes.io/azure-load-balancer-internal: "true"
     global:
       # Ensure that the Istio pods are only scheduled to run on Linux nodes
       defaultNodeSelector:
