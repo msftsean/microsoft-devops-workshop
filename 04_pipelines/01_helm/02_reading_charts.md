@@ -55,5 +55,5 @@ $ helm upgrade --install ha-redis stable/redis
 You can copy the values.yaml from the chart repo to a local file called, `local-redis-values.yml`, and make customizations. Your values will be merged with the default values, prior to the interpolation step.
 
 ```
-$ helm update --install ha-redis stable/redis -f local-redis-values.yml
+$ helm upgrade --install ha-redis stable/redis -f local-redis-values.yml
 ```
