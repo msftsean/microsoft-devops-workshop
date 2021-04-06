@@ -31,6 +31,28 @@ prometheus:
     podMetadata:
       annotations: 
         sidecar.istio.io/inject: "false"
+    image:
+      repository: quay.io/prometheus/prometheus
+      tag: v2.24.0
+
+alertmanager:
+  alertmanagerSpec:
+    image:
+      repository: quay.io/prometheus/alertmanager
+      tag: v0.21.0
+
+prometheusOperator:
+  image:
+    repository: quay.io/prometheus-operator/prometheus-operator
+    tag: v0.45.0
+  prometheusConfigReloaderImage:
+    repository: quay.io/prometheus-operator/prometheus-config-reloader
+    tag: v0.45.0
+  admissionWebhooks:
+    patch:
+      image:
+        repository: jettech/kube-webhook-certgen
+        tag: v1.5.0
 
 defaultRules:
   rules:
@@ -54,6 +76,28 @@ coreDns:
   enabled: false
 
 grafana:
+  image:
+    repository: docker.io/grafana/grafana
+    tag: 7.3.5
+  testFramework:
+    image: "docker.io/bats/bats"
+    tag: "v1.1.0"
+  downloadDashboardsImage:
+    repository: docker.io/curlimages/curl
+    tag: 7.73.0
+  initChownData:
+    image:
+      repository: docker.io/busybox
+      tag: "1.31.1"
+  sidecar:
+    image:
+      repository: quay.io/kiwigrid/k8s-sidecar
+      tag: 1.10.7
+      sha: ""
+  imageRenderer:
+    image:
+      repository: docker.io/grafana/grafana-image-renderer
+      tag: latest
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
@@ -226,6 +270,11 @@ kubectl port-forward svc/kube-prometheus-stack-alertmanager -n monitoring 9093 9
 
 `kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/jaeger.yaml -n istio-system`
 
+If you are using a private registry, download the appropriate image, modify and run the following command:
+```
+kubectl patch deployment jaeger --patch '{"spec": {"template": {"spec": {"containers": [{"name": "jaeger","image": "docker.io/jaegertracing/all-in-one:1.20"}]}}}}' -n istio-system
+```
+
 Check Out Jaeger Dashboard (navigate to localhost:8081)
 ```
 kubectl port-forward svc/tracing -n istio-system 8081:80
@@ -238,12 +287,15 @@ kubectl create namespace kiali-operator
 ```
 
 ```
-helm install \
+helm upgrade --install \
     --set cr.create=false \
+    --set image.repo=quay.io/kiali/kiali-operator \
+    --set image.tag=v1.32.0 \
     --namespace kiali-operator \
     --repo https://kiali.org/helm-charts \
+    --version 1.32.0 \
     kiali-operator \
-    kiali-operator --debug --dry-run
+    kiali-operator
 ```
 
 istio-kiali.yml
@@ -255,6 +307,9 @@ metadata:
   annotations:
     ansible.operator-sdk/verbosity: "1"
 spec:
+  deployment:
+    image_name: jmeisnertestaks.azurecr.io/kiali/kiali
+    image_version: v1.32.0
   istio_component_namespaces:
     prometheus: monitoring
     grafana: monitoring

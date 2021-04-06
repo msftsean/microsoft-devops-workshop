@@ -13,7 +13,7 @@ At the latest revision of this document, the version is `1.8.2`
 Setup your KUBECONFIG file, for the target cluster, such that `kubectl get all --all-namespaces` connects to the appropriate cluster. The following command will install the istio operator onto that cluster.
 
 ```
-istioctl operator init
+istioctl operator init --hub docker.io/istio
 ```
 
 Expected Output:
@@ -53,6 +53,15 @@ metadata:
 spec:
   # Use the default profile as the base
   # More details at: https://istio.io/docs/setup/additional-setup/config-profiles/
+  meshConfig:
+    defaultConfig:
+      proxyMetadata:
+        ISTIO_META_DNS_CAPTURE: "true"
+        ISTIO_META_PROXY_XDS_VIA_AGENT: "true"
+  hub: docker.io/istio
+  addonComponents:
+    istiocoredns:
+      enabled: false
   profile: default
   values:
     gateways:
@@ -66,6 +75,7 @@ spec:
       # Ensure that the Istio pods are only scheduled to run on Linux nodes
       defaultNodeSelector:
         beta.kubernetes.io/os: linux
+
       # Uncomment this, if you want to allow tcpdump on the proxy.
       # proxy:
       #   privileged: true
