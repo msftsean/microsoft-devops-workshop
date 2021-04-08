@@ -308,7 +308,7 @@ metadata:
     ansible.operator-sdk/verbosity: "1"
 spec:
   deployment:
-    image_name: jmeisnertestaks.azurecr.io/kiali/kiali
+    image_name: quay.io/kiali/kiali
     image_version: v1.32.0
   istio_component_namespaces:
     prometheus: monitoring
